@@ -65,4 +65,5 @@ set number
 set relativenumber
 set wrapscan
 set tabstop=2
+set shiftwidth=2
 set smartindent
