@@ -6,6 +6,8 @@ endif
 
 call plug#begin('~/.vim/plugged')
 
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
 Plug 'vlime/vlime', { 'rtp': 'vim/' }
 Plug 'luochen1990/rainbow'
 
@@ -25,8 +27,21 @@ function! StartVlimeServer()
  let g:vlime_server_started = 1
 endfunction
 
+"------------
+"haskell lsp
+"------------
+augroup LspHaskell
+    autocmd!
+    autocmd FileType haskell call lsp#register_server({
+        \ 'name': 'haskell-language-server',
+        \ 'cmd': ['haskell-language-server-wrapper', '--lsp'],
+        \ 'allowlist': ['haskell'],
+        \ })
+augroup END
 
- " rainbowの設定とか
+"------------
+"rainbow
+"------------
 let g:rainbow_active = 1
 
 
