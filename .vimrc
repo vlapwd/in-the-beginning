@@ -27,6 +27,7 @@ function! StartVlimeServer()
  let g:vlime_server_started = 1
 endfunction
 
+
 "------------
 "haskell lsp
 "------------
@@ -38,6 +39,7 @@ augroup LspHaskell
         \ 'allowlist': ['haskell'],
         \ })
 augroup END
+
 
 "------------
 "rainbow
@@ -67,3 +69,40 @@ set wrapscan
 set tabstop=2
 set shiftwidth=2
 set smartindent
+
+
+"------------
+"command
+"------------
+function! CreateAndOpenMemo(fileName)
+    let l:file = expand('./' . a:fileName . '.md')
+    if !filereadable(l:file)
+        call system('touch ' . shellescape(l:file))
+    endif
+    execute 'split ' . l:file
+endfunction
+
+command! -nargs=1 Tm call CreateAndOpenMemo(<q-args>)
+
+function! AddTask(text)
+    call system('echo ' . shellescape(a:text) . ' >> ./todo.md')
+endfunction
+
+command! -nargs=1 Tt call AddTask(<q-args>)
+
+function! OpenFileFromList()
+    let files = split(system('find . -type f'), "\n")
+    if empty(files)
+        echo "No files found"
+        return
+    endif
+
+    let choices = map(copy(files), 'v:val . " (" . (v:key + 1) . ")"')
+    let choice = inputlist(choices)
+
+    if choice > 0 && choice <= len(files)
+        execute "split " . files[choice - 1]
+    endif
+endfunction
+
+command! Tls call OpenFileFromList()
