@@ -5,6 +5,12 @@ if [ ! -L ~/.vimrc ]; then
 ln -s $(pwd)/.vimrc ~/.vimrc
 fi
 
+# update vim
+brew install vim
+echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+vim --version | grep "VIM"
+
 # homebrew
 if ! command -v brew &>/dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -24,7 +30,11 @@ fi
 
 # nvm
 if ! command -v nvm &>/dev/null; then
-  # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+  nvm -v
 else
   echo "nvm aru $(nvm -v)"
 fi
+
+# deno
+brew install deno
