@@ -10,8 +10,54 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
 Plug 'vlime/vlime', { 'rtp': 'vim/' }
 Plug 'luochen1990/rainbow'
+Plug 'vim-denops/denops.vim'
+Plug 'shougo/ddu.vim'
+Plug 'shougo/ddu-ui-ff'
+Plug 'shougo/ddu-source-file_rec'
+Plug 'shougo/ddu-filter-matcher_substring'
+Plug 'shougo/ddu-kind-file'
 
 call plug#end()
+
+
+"------------
+"denops
+"------------
+let g:denops#deno = '/opt/homebrew/bin/deno'
+
+
+"------------
+"ddu
+"------------
+call ddu#custom#patch_global(#{
+    \   ui: 'ff',
+    \   sources: [#{name: 'file_rec', params: {}}],
+    \   sourceOptions: #{
+    \     _: #{
+    \       matchers: ['matcher_substring'],
+    \     },
+    \   },
+    \   kindOptions: #{
+    \     file: #{
+    \       defaultAction: 'open',
+    \     },
+    \   }
+    \ })
+
+
+autocmd FileType ddu-ff call s:ddu_my_settings()
+function! s:ddu_my_settings() abort
+  nnoremap <buffer><silent> <CR>
+        \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
+  nnoremap <buffer><silent> <Space>
+        \ <Cmd>call ddu#ui#do_action('toggleSelectItem')<CR>
+  nnoremap <buffer><silent> i
+        \ <Cmd>call ddu#ui#do_action('openFilterWindow')<CR>
+  nnoremap <buffer><silent> q
+        \ <Cmd>call ddu#ui#do_action('quit')<CR>
+endfunction
+
+command! Tls call ddu#start({})
 
 
 "------------
