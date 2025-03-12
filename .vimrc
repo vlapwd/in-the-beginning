@@ -136,6 +136,11 @@ endfunction
 
 command! -nargs=1 Tt call AddTask(<q-args>)
 
+
+"------------
+"memo
+"------------
+" ddu入れる前に一覧したかった時のやつ
 function! OpenFileFromList()
     let files = split(system('find . -type f'), "\n")
     if empty(files)
@@ -151,4 +156,32 @@ function! OpenFileFromList()
     endif
 endfunction
 
-command! Tls call OpenFileFromList()
+" チートシート
+function! OpenCheatSheet()
+  split cheatsheet
+  setlocal buftype=nofile
+  setlocal bufhidden=wipe
+  setlocal nobuflisted
+  setlocal nonumber
+  setlocal norelativenumber
+  setlocal noswapfile
+  setlocal filetype=help
+  call setline(1, [
+        \ ' Vim Cheat Sheet ',
+        \ '----------------',
+        \ ':q  - Quit',
+        \ ':w  - Save',
+        \ ':wq - Save and Quit',
+        \ 'dd  - Delete line',
+        \ 'yy  - Copy line',
+        \ 'p   - Paste',
+        \ 'u   - Undo',
+        \ 'Ctrl-r - Redo',
+        \ '',
+        \ 'Press ENTER to close'
+        \ ])
+  nnoremap <buffer> <CR> :q<CR>
+endfunction
+
+command! Th call OpenCheatSheet()
+
