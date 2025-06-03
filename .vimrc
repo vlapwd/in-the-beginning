@@ -8,6 +8,8 @@ call plug#begin('~/.vim/plugged')
 
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'vlime/vlime', { 'rtp': 'vim/' }
 Plug 'luochen1990/rainbow'
 Plug 'vim-denops/denops.vim'
@@ -86,6 +88,21 @@ augroup LspHaskell
         \ })
 augroup END
 
+"------------
+"vim-lsp
+"------------
+" 自動でLSP起動
+let g:lsp_auto_enable = 1
+
+"------------
+"asynccomplete
+"------------
+" 補完を自動でトリガー
+autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+autocmd FileType javascript,typescript,typescriptreact,javascriptreact setlocal omnifunc=lsp#complete
+
+let g:asyncomplete_auto_popup = 1
+
 
 "------------
 "rainbow
@@ -116,6 +133,15 @@ set tabstop=2
 set shiftwidth=2
 set smartindent
 
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/.vim/lsp.log')
+
+highlight Pmenu      ctermfg=189 ctermbg=235 guifg=#cdd6f4 guibg=#1e1e2e
+highlight PmenuSel   ctermfg=16 ctermbg=117 guifg=#11111b guibg=#89b4fa
+highlight PmenuSbar  ctermbg=238 guibg=#45475a
+highlight PmenuThumb ctermbg=117 guibg=#89b4fa
+
+autocmd FileType qf setlocal nobuflisted
 
 "------------
 "command
@@ -136,6 +162,27 @@ endfunction
 
 command! -nargs=1 Tt call AddTask(<q-args>)
 
+function! ShowTodoInQuickfix()
+  let l:lines = getline(1, '$')
+  let l:qf_list = []
+
+  for i in range(len(l:lines))
+    if l:lines[i] =~ '^-' " TODO行だけ抽出
+      call add(l:qf_list, {'filename': expand('%'), 'lnum': i + 1, 'text': l:lines[i]})
+    endif
+  endfor
+
+  call setqflist(l:qf_list, 'r')
+
+	" 現在のウィンドウの高さ取得して70%計算
+  let l:win_height = winheight(0)
+  let l:qf_height = float2nr(l:win_height * 0.7)
+
+  " Quickfix開いてリサイズ
+  execute 'copen ' . l:qf_height
+endfunction
+
+command! Todo call ShowTodoInQuickfix()
 
 "------------
 "memo
@@ -169,14 +216,15 @@ function! OpenCheatSheet()
   call setline(1, [
         \ ' Vim Cheat Sheet ',
         \ '----------------',
-        \ ':q  - Quit',
-        \ ':w  - Save',
-        \ ':wq - Save and Quit',
-        \ 'dd  - Delete line',
-        \ 'yy  - Copy line',
-        \ 'p   - Paste',
-        \ 'u   - Undo',
-        \ 'Ctrl-r - Redo',
+        \ ':q      - Quit',
+        \ ':w      - Save',
+        \ ':wq     - Save and Quit',
+        \ 'dd      - Delete line',
+        \ 'yy      - Copy line',
+        \ 'p       - Paste',
+        \ 'u       - Undo',
+        \ 'Ctrl-r  - Redo',
+				\ 'Ctrl-w  - Window移動',
         \ '',
         \ 'Press ENTER to close'
         \ ])
