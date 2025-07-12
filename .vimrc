@@ -132,6 +132,7 @@ set wrapscan
 set tabstop=2
 set shiftwidth=2
 set smartindent
+set clipboard+=unnamed
 
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/.vim/lsp.log')
@@ -225,6 +226,8 @@ function! OpenCheatSheet()
         \ 'u       - Undo',
         \ 'Ctrl-r  - Redo',
 				\ 'Ctrl-w  - Window移動',
+				\ 'n       - 次の検索結果',
+				\ 'N       - 前の検索結果',
         \ '',
         \ 'Press ENTER to close'
         \ ])
@@ -232,4 +235,3 @@ function! OpenCheatSheet()
 endfunction
 
 command! Th call OpenCheatSheet()
-
