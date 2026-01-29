@@ -4,6 +4,13 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
   autocmd VimEnter * call plug#begin(data_dir . '/plugged') | PlugInstall --sync | source $MYVIMRC | call plug#end()
 endif
 
+" Plug足したら:PlugInstall
+" Install状況確認するなら:PlugStatus
+" updateは:PlugUpdate
+" denopsがキャッシュ持ってる可能性があるので
+" ddu系を触ったらキャッシュ更新、再起動
+" :call denops#cache#update(#{reload: v:true})
+" :call denops#server#restart()
 call plug#begin('~/.vim/plugged')
 
 Plug 'prabirshrestha/vim-lsp'
@@ -15,7 +22,10 @@ Plug 'luochen1990/rainbow'
 Plug 'vim-denops/denops.vim'
 Plug 'shougo/ddu.vim'
 Plug 'shougo/ddu-ui-ff'
+Plug 'shougo/ddu-ui-filer'
+Plug 'shougo/ddu-source-file'
 Plug 'shougo/ddu-source-file_rec'
+Plug 'shougo/ddu-filter-sorter_alpha'
 Plug 'shougo/ddu-filter-matcher_substring'
 Plug 'shougo/ddu-kind-file'
 
@@ -32,8 +42,6 @@ let g:denops#deno = '/opt/homebrew/bin/deno'
 "ddu
 "------------
 call ddu#custom#patch_global(#{
-    \   ui: 'ff',
-    \   sources: [#{name: 'file_rec', params: {}}],
     \   sourceOptions: #{
     \     _: #{
     \       matchers: ['matcher_substring'],
@@ -46,20 +54,66 @@ call ddu#custom#patch_global(#{
     \   }
     \ })
 
+autocmd FileType ddu-filer call s:ddu_filer_settings()
+function! s:ddu_filer_settings() abort
+  " 基本
+  nnoremap <buffer><silent> q  <Cmd>call ddu#ui#do_action('quit')<CR>
+  nnoremap <buffer><silent> <CR> <Cmd>call ddu#ui#do_action('itemAction')<CR>
 
-autocmd FileType ddu-ff call s:ddu_my_settings()
-function! s:ddu_my_settings() abort
-  nnoremap <buffer><silent> <CR>
-        \ <Cmd>call ddu#ui#do_action('itemAction')<CR>
-  nnoremap <buffer><silent> <Space>
-        \ <Cmd>call ddu#ui#do_action('toggleSelectItem')<CR>
-  nnoremap <buffer><silent> i
-        \ <Cmd>call ddu#ui#do_action('openFilterWindow')<CR>
-  nnoremap <buffer><silent> q
-        \ <Cmd>call ddu#ui#do_action('quit')<CR>
+  " ツリー操作（ranger風）
+  nnoremap <buffer><silent> l  <Cmd>call ddu#ui#do_action('expandItem')<CR>
+  nnoremap <buffer><silent> h  <Cmd>call ddu#ui#do_action('collapseItem')<CR>
+
+  " 分割で開く
+  nnoremap <buffer><silent> s  <Cmd>call ddu#ui#do_action('itemAction', #{name: 'open', params: #{command: 'split'}})<CR>
+  nnoremap <buffer><silent> v  <Cmd>call ddu#ui#do_action('itemAction', #{name: 'open', params: #{command: 'vsplit'}})<CR>
+  nnoremap <buffer><silent> t  <Cmd>call ddu#ui#do_action('itemAction', #{name: 'open', params: #{command: 'tabedit'}})<CR>
+
+  " 隠しファイルのトグル（好み）
+  nnoremap <buffer><silent> .  <Cmd>call ddu#ui#do_action('toggleHiddenFiles')<CR>
+
+  " フィルタ（絞り込み）
+  nnoremap <buffer><silent> /  <Cmd>call ddu#ui#do_action('openFilterWindow')<CR>
+
+  " ディレクトリ移動（kind=file の cd アクション）
+  nnoremap <buffer><silent> cd <Cmd>call ddu#ui#do_action('itemAction', #{name: 'cd'})<CR>
 endfunction
 
-command! Tls call ddu#start({})
+
+" ツリー（ファイラ）
+command! -nargs=? Ls call ddu#start(#{
+\  name: 'filer',
+\  ui: 'filer',
+\  sources: [#{
+\    name: 'file',
+\    params: #{ path: (<q-args> !=# '' ? <q-args> : getcwd()) },
+\  }],
+\  sourceOptions: #{
+\    _: #{
+\      sorters: ['sorter_alpha'],
+\    },
+\  },
+\  kindOptions: #{
+\    file: #{ defaultAction: 'open' },
+\  },
+\  uiParams: #{
+\    filer: #{
+\      split: 'vertical',
+\      winWidth: 38,
+\      indentWidth: 2,
+\      indentMarker: '│ ',
+\      lastItemIndentMarker: '└ ',
+\      showHiddenFiles: v:false,
+\    },
+\  },
+\})
+
+" 検索（今の global をそのまま使うならこれでもOK）
+command! Tfiles call ddu#start(#{
+\  name: 'files',
+\  ui: 'ff',
+\  sources: [#{name: 'file_rec', params: #{}}],
+\})
 
 
 "------------
@@ -93,6 +147,27 @@ augroup END
 "------------
 " 自動でLSP起動
 let g:lsp_auto_enable = 1
+" LSPの基本設定
+function! s:on_lsp_buffer_enabled() abort
+    setlocal omnifunc=lsp#complete
+    setlocal signcolumn=yes
+
+    " 定義ジャンプ！
+    nmap <buffer> gd <plug>(lsp-definition)
+    " 使用箇所の検索！
+    nmap <buffer> gr <plug>(lsp-references)
+
+    " その他便利なやつ
+    nmap <buffer> gi <plug>(lsp-implementation)
+    nmap <buffer> gt <plug>(lsp-type-definition)
+    nmap <buffer> <leader>rn <plug>(lsp-rename)
+    nmap <buffer> K <plug>(lsp-hover)
+endfunction
+
+augroup lsp_install
+    au!
+    autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
 
 "------------
 "asynccomplete
@@ -228,6 +303,12 @@ function! OpenCheatSheet()
 				\ 'Ctrl-w  - Window移動',
 				\ 'n       - 次の検索結果',
 				\ 'N       - 前の検索結果',
+				\ '*       - 今いる単語を検索',
+				\ 'gd      - 定義にジャンプ',
+				\ 'gr      - 使用箇所検索',
+				\ 'K       - docs表示',
+				\ 'Ctrl-o  - ジャンプ先から戻る',
+				\ ':LspManageServer  - Lsp一覧を開く',
         \ '',
         \ 'Press ENTER to close'
         \ ])
