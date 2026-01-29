@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# カレントディレクトのまま分割
+# iteam -> settings -> Profiles -> General -> Initial directory -> Advanced Configuration -> Working Directory for New Split Panes -> Resume previous session's directory`
 # vimrc
 if [ ! -L ~/.vimrc ]; then
 ln -s $(pwd)/.vimrc ~/.vimrc
@@ -10,6 +12,12 @@ brew install vim
 echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 vim --version | grep "VIM"
+
+# fzf
+brew install fzf
+
+# ripgrep
+brew install ripgrep
 
 # homebrew
 if ! command -v brew &>/dev/null; then
@@ -38,3 +46,6 @@ fi
 
 # deno
 brew install deno
+
+# elm
+# https://guide.elm-lang.org/install/elm.html
