@@ -20,97 +20,97 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   ------- fzf
   {
-    'junegunn/fzf',
-		build = ':call fzf#install()',
+    "junegunn/fzf",
+    build = ":call fzf#install()",
   },
   {
-    'junegunn/fzf.vim',
-    dependencies = { 'junegunn/fzf' },
+    "junegunn/fzf.vim",
+    dependencies = { "junegunn/fzf" },
     keys = {
-      { '<C-p>', '<cmd>Files<cr>', desc = 'Find files' },
-      { '<C-g>', '<cmd>Rg<cr>', desc = 'Grep search' },
-      { '<leader>b', '<cmd>Buffers<cr>', desc = 'Find buffers' },
+      { "<C-p>", "<cmd>Files<cr>", desc = "Find files" },
+      { "<C-g>", "<cmd>Rg<cr>", desc = "Grep search" },
+      { "<leader>b", "<cmd>Buffers<cr>", desc = "Find buffers" },
     },
   },
 
-	  -- LSP
+  -- LSP
   {
-    'neovim/nvim-lspconfig',
+    "neovim/nvim-lspconfig",
     dependencies = {
-      'williamboman/mason.nvim',
-      'williamboman/mason-lspconfig.nvim',
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
     },
     config = function()
       -- mason setup（LSPサーバーのインストーラー）
-      require('mason').setup()
-      require('mason-lspconfig').setup({
-        ensure_installed = { 'ts_ls', 'gopls' },
+      require("mason").setup()
+      require("mason-lspconfig").setup({
+        ensure_installed = { "ts_ls", "gopls" },
         automatic_installation = true,
       })
 
       -- TypeScript
-      vim.lsp.config('ts_ls', {
-        filetypes = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+      vim.lsp.config("ts_ls", {
+        filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
       })
 
-			-- Golang
-			vim.lsp.config('gopls', {
-  			filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
-			})
+      -- Golang
+      vim.lsp.config("gopls", {
+        filetypes = { "go", "gomod", "gowork", "gotmpl" },
+      })
 
       -- TypeScript/JavaScriptファイルでLSP有効化
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = { 'typescript', 'typescriptreact', 'javascript', 'javascriptreact' },
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
         callback = function()
-          vim.lsp.enable('ts_ls')
+          vim.lsp.enable("ts_ls")
         end,
       })
 
-			-- GoファイルでLSP有効化（新規追加）
-			vim.api.nvim_create_autocmd('FileType', {
-  			pattern = { 'go', 'gomod', 'gowork', 'gotmpl' },
-  			callback = function()
-    			vim.lsp.enable('gopls')
-  			end,
-			})
+      -- GoファイルでLSP有効化（新規追加）
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "go", "gomod", "gowork", "gotmpl" },
+        callback = function()
+          vim.lsp.enable("gopls")
+        end,
+      })
 
       -- LSPキーマップ（バッファにLSPがアタッチされたときに設定）
-      vim.api.nvim_create_autocmd('LspAttach', {
+      vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
-    			local client = vim.lsp.get_client_by_id(args.data.client_id)
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
 
-    			-- セマンティックトークンを無効化（Tree-sitterに任せる）
-    			if client then
-      			client.server_capabilities.semanticTokensProvider = nil
-    			end
+          -- セマンティックトークンを無効化（Tree-sitterに任せる）
+          if client then
+            client.server_capabilities.semanticTokensProvider = nil
+          end
 
           local opts = { buffer = args.buf }
-          vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-          vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-          vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-          vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, opts)
-          vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-          vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-          vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+          vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+          vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+          vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+          vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+          vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
         end,
       })
     end,
   },
 
-	------- 補完
+  ------- 補完
   {
-    'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
     dependencies = {
-      'hrsh7th/cmp-nvim-lsp',     -- LSP補完
-      'hrsh7th/cmp-buffer',       -- バッファ内の単語補完
-      'hrsh7th/cmp-path',         -- パス補完
-      'L3MON4D3/LuaSnip',         -- スニペットエンジン
-      'saadparwaiz1/cmp_luasnip', -- スニペット補完
+      "hrsh7th/cmp-nvim-lsp", -- LSP補完
+      "hrsh7th/cmp-buffer", -- バッファ内の単語補完
+      "hrsh7th/cmp-path", -- パス補完
+      "L3MON4D3/LuaSnip", -- スニペットエンジン
+      "saadparwaiz1/cmp_luasnip", -- スニペット補完
     },
     config = function()
-      local cmp = require('cmp')
-      local luasnip = require('luasnip')
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
 
       cmp.setup({
         snippet = {
@@ -119,12 +119,12 @@ require("lazy").setup({
           end,
         },
         mapping = cmp.mapping.preset.insert({
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-          ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          ['<C-Space>'] = cmp.mapping.complete(),
-          ['<C-e>'] = cmp.mapping.abort(),
-          ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Enterで確定
-          ['<Tab>'] = cmp.mapping(function(fallback)
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }), -- Enterで確定
+          ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
             elseif luasnip.expand_or_jumpable() then
@@ -132,8 +132,8 @@ require("lazy").setup({
             else
               fallback()
             end
-          end, { 'i', 's' }),
-          ['<S-Tab>'] = cmp.mapping(function(fallback)
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item()
             elseif luasnip.jumpable(-1) then
@@ -141,32 +141,48 @@ require("lazy").setup({
             else
               fallback()
             end
-          end, { 'i', 's' }),
+          end, { "i", "s" }),
         }),
         sources = cmp.config.sources({
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
         }, {
-          { name = 'buffer' },
-          { name = 'path' },
+          { name = "buffer" },
+          { name = "path" },
         }),
       })
     end,
   },
 
+  ------- フォーマッタ管理
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    opts = {
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = false,
+      },
+      formatters_by_ft = {
+        lua = { "stylua" },
+      },
+    },
+  },
+
   -- Tree-sitter（シンタックスハイライト強化）
   {
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    event = { 'BufReadPost', 'BufNewFile' },
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    ft = { "typescript", "typescriptreact", "javascript", "javascriptreact", "lua", "go" },
+    -- event = { 'BufReadPre', 'BufNewFile' },
     config = function()
-      local ok, configs = pcall(require, 'nvim-treesitter.configs')
+      local ok, configs = pcall(require, "nvim-treesitter.configs")
       if not ok then
         return
       end
-      
+
       configs.setup({
-        ensure_installed = { 'typescript', 'tsx', 'javascript', 'lua', 'go' },
+        ensure_installed = { "typescript", "tsx", "javascript", "lua", "go" },
         sync_install = false,
         auto_install = true,
         highlight = {
@@ -177,69 +193,186 @@ require("lazy").setup({
     end,
   },
 
-	-- Rainbow括弧（モダン版）
+  -- Rainbow括弧（モダン版）
   {
-    'HiPhish/rainbow-delimiters.nvim',
-		init = function()
-    local rainbow_delimiters = require("rainbow-delimiters")
+    "HiPhish/rainbow-delimiters.nvim",
+    init = function()
+      local rainbow_delimiters = require("rainbow-delimiters")
 
-    vim.g.rainbow_delimiters = {
-			strategy = {
-        [""] = "rainbow-delimiters.strategy.global",
-      },
-      query = {
-        [""] = "rainbow-delimiters",
-      },
-      priority = {
-        [""] = 210,
-      },
-      highlight = {
-        "RainbowDelimiterRed",
-        "RainbowDelimiterYellow",
-        "RainbowDelimiterBlue",
-        "RainbowDelimiterOrange",
-        "RainbowDelimiterGreen",
-        "RainbowDelimiterViolet",
-        "RainbowDelimiterCyan",
-      },
-    }
-  	end,
-	config = function()
-    vim.api.nvim_create_autocmd("ColorScheme", {
-      callback = function()
-        local colors = {
-          Red    = "#E06C75",
-          Yellow= "#E5C07B",
-          Blue   = "#61AFEF",
-          Orange = "#D19A66",
-          Green  = "#98C379",
-          Violet = "#C678DD",
-          Cyan   = "#56B6C2",
-        }
+      vim.g.rainbow_delimiters = {
+        strategy = {
+          [""] = "rainbow-delimiters.strategy.global",
+        },
+        query = {
+          [""] = "rainbow-delimiters",
+        },
+        priority = {
+          [""] = 210,
+        },
+        highlight = {
+          "RainbowDelimiterRed",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+        },
+      }
+    end,
+    config = function()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        callback = function()
+          local colors = {
+            Red = "#D07A7F",
+            Yellow = "#E5C07B",
+            Blue = "#61AFEF",
+            Orange = "#D19A66",
+            Green = "#98C379",
+            Violet = "#C678DD",
+            Cyan = "#56B6C2",
+          }
 
-        for name, color in pairs(colors) do
-          vim.api.nvim_set_hl(
-            0,
-            "RainbowDelimiter" .. name,
-            { fg = color }
-          )
-        end
-      end,
-    })
+          for name, color in pairs(colors) do
+            vim.api.nvim_set_hl(0, "RainbowDelimiter" .. name, { fg = color })
+          end
+        end,
+      })
 
-    -- default colorscheme 対策（すでに読み込まれてた分）
-    if vim.g.colors_name then
-      vim.cmd.colorscheme(vim.g.colors_name)
-    end
-  end,
+      -- default colorscheme 対策（すでに読み込まれてた分）
+      if vim.g.colors_name then
+        vim.cmd.colorscheme(vim.g.colors_name)
+      end
+    end,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      require("nightfox").setup({
+        options = {
+          style = "nightfox",
+        },
+      })
+      vim.cmd("colorscheme nightfox")
+    end,
+  },
+  ------- CSV
+  {
+    "mechatroner/rainbow_csv",
+    ft = { "csv", "tsv" },
   },
 
-	------- CSV
-	{
-  'mechatroner/rainbow_csv',
-  ft = { 'csv', 'tsv' },
-	},
+  ------- file tree
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    cmd = "Neotree",
+    keys = {
+      {
+        "nt",
+        function()
+          require("neo-tree.command").execute({ toggle = true })
+        end,
+        mode = "n", -- ノーマルモード
+        desc = "Toggle NeoTree",
+      },
+      {
+        "nd",
+        function()
+          require("neo-tree.command").execute({
+            source = "git_status",
+            position = "left",
+            toggle = true,
+          })
+        end,
+        mode = "n",
+        desc = "NeoTree Git Status",
+      },
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      require("neo-tree").setup({
+        filesystem = {
+          filtered_items = {
+            hide_dotfiles = false,
+          },
+        },
+        window = {
+          position = "left",
+          width = 40, -- default 30
+          mappings = {
+            ["D"] = function(state)
+              local node = state.tree:get_node()
+              if node.type == "file" then
+                vim.cmd("Gdiffsplit " .. vim.fn.fnameescape(node.path))
+              end
+            end,
+          },
+        },
+      })
+    end,
+  },
+  {
+    "tpope/vim-fugitive",
+  },
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    config = function()
+      require("toggleterm").setup({
+        size = 20,
+        open_mapping = [[<c-\>]], -- Ctrl + \ で開閉
+        direction = "float", -- フローティング表示
+        shade_terminals = true,
+        close_on_exit = true,
+        float_opts = {
+          border = "curved",
+          winblend = 0,
+        },
+      })
 
+      -- ノーマルモードで <leader>t でも開けるようにする
+      vim.keymap.set("n", "gy", "<cmd>ToggleTerm<CR>", { desc = "Toggle Terminal" })
+
+      -- 開いた時に強制ターミナルモード
+      vim.api.nvim_create_autocmd("TermEnter", {
+        pattern = "term://*toggleterm#*",
+        callback = function()
+          vim.cmd("startinsert")
+        end,
+      })
+      -- ターミナルモードで Esc を押したらノーマルモードに戻る
+      vim.api.nvim_create_autocmd("TermOpen", {
+        pattern = "term://*toggleterm#*",
+        callback = function()
+          vim.keymap.set("t", "<Esc>", [[<C-\><C-n><cmd>ToggleTerm<CR>]], {
+            buffer = true,
+            silent = true,
+          })
+        end,
+      })
+    end,
+  },
+
+  ------- commit log
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    keys = {
+      { "dh", "<cmd>DiffviewFileHistory %<cr>", desc = "File history (current file)" },
+      { "dH", "<cmd>DiffviewFileHistory<cr>", desc = "Repo history" },
+      { "do", "<cmd>DiffviewOpen<cr>", desc = "Diffview open" },
+      { "dq", "<cmd>DiffviewClose<cr>", desc = "Diffview close" },
+    },
+    opts = {}, -- とりあえずデフォルトでOK
+  },
 }, {
   -- lazy.nvimの設定（オプション）
   checker = { enabled = true }, -- 自動アップデートチェック
@@ -257,7 +390,8 @@ vim.opt.wrapscan = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.smartindent = true
-vim.opt.clipboard:append('unnamed')
+vim.opt.clipboard:append("unnamed")
+vim.opt.hidden = true
 
 -- LSP ログ設定
 vim.g.lsp_log_verbose = 1
@@ -281,12 +415,61 @@ vim.cmd([[
   highlight PmenuThumb ctermbg=117 guibg=#89b4fa
 ]])
 
+-- ハイライト自動実行
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+  callback = function()
+    -- すでに動いてたら何もしない
+    local buf = vim.api.nvim_get_current_buf()
+    if vim.treesitter.highlighter.active[buf] then
+      return
+    end
+
+    -- パーサが取れるバッファだけ start（エラー握りつぶし）
+    pcall(vim.treesitter.get_parser, buf)
+    pcall(vim.treesitter.start, buf)
+  end,
+})
+
+-- 開いてるファイルのパスコピー
+vim.keymap.set("n", "fp", function()
+  vim.fn.setreg("+", vim.fn.expand("%:p"))
+end, { desc = "Copy file path" })
+
 -- Quickfixをバッファリストに表示しない
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'qf',
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
   callback = function()
     vim.opt_local.buflisted = false
   end,
+})
+
+-- 検索中だけハイライト。移動したら消す（重い hlsearch を常時回さない）
+vim.opt.hlsearch = true
+vim.opt.incsearch = true
+
+-- ノーマル移動したら hlsearch を消す（n/N や * は消さない、なども可能）
+vim.api.nvim_create_autocmd("CursorMoved", {
+  callback = function()
+    if vim.v.hlsearch == 1 then
+      vim.cmd("nohlsearch")
+    end
+  end,
+})
+
+-- 開いてるファイルのパスコピー
+vim.api.nvim_create_user_command("Path", function()
+  vim.fn.setreg("+", vim.fn.expand("%:p"))
+end, {})
+
+-- エラー確認
+vim.keymap.set("n", "ge", vim.diagnostic.open_float, {
+  desc = "Show diagnostic under cursor",
+})
+
+-- 開いてるbuffer一覧
+vim.keymap.set("n", "gb", ":buffers<CR>:b ", {
+  desc = "List buffers and jump",
 })
 
 -- ============================================================================
@@ -309,6 +492,15 @@ local function open_cheatsheet()
     "------------------",
     "",
     "基本",
+    "w             - 次の単語",
+    "b             - 前の単語",
+    "e             - 単語の末尾",
+    "ctr-f         - 画面分下",
+    "ctr-b         - 画面分上",
+    "*             - カーソルの単語を下に検索",
+    "#             - カーソルの単語を上に検索",
+    ":noh          - 単語のハイライト消す",
+    ":e            - ファイル更新",
     ":q            - Quit",
     ":w            - Save",
     ":wq           - Save and Quit",
@@ -323,6 +515,7 @@ local function open_cheatsheet()
     "n             - 次の検索結果",
     "N             - 前の検索結果",
     "*             - 今いる単語を検索",
+    ":%s/mae/ato/  - 全行置換",
     "",
     "FZF (fzf.vim)",
     "Ctrl-p        - Files (ファイル検索)",
@@ -338,6 +531,7 @@ local function open_cheatsheet()
     "leader + rn   - Rename",
     "leader + ca   - Code Action",
     "Ctrl-o        - ジャンプ先から戻る",
+    "Ctrl-n        - インポート補完",
     "",
     "LSP/Mason",
     ":Mason        - LSPサーバ等の管理画面",
@@ -358,4 +552,3 @@ local function open_cheatsheet()
 end
 
 vim.api.nvim_create_user_command("Th", open_cheatsheet, {})
-
