@@ -13,6 +13,10 @@ echo 'export PATH="/opt/homebrew/bin:$PATH"' >> ~/.zshrc
 source ~/.zshrc
 vim --version | grep "VIM"
 
+# cmux
+brew tap manaflow-ai/cmux
+brew install --cask cmux
+
 # fzf
 brew install fzf
 
