@@ -39,6 +39,7 @@ require("lazy").setup({
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
       -- mason setup（LSPサーバーのインストーラー）
@@ -48,14 +49,23 @@ require("lazy").setup({
         automatic_installation = true,
       })
 
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
       -- TypeScript
       vim.lsp.config("ts_ls", {
         filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
+        capabilities = capabilities,
       })
 
       -- Golang
       vim.lsp.config("gopls", {
         filetypes = { "go", "gomod", "gowork", "gotmpl" },
+        capabilities = capabilities,
+      })
+
+      -- Dart（Language ServerはDart SDKに同梱）
+      vim.lsp.config("dartls", {
+        capabilities = capabilities,
       })
 
       -- TypeScript/JavaScriptファイルでLSP有効化
@@ -71,6 +81,14 @@ require("lazy").setup({
         pattern = { "go", "gomod", "gowork", "gotmpl" },
         callback = function()
           vim.lsp.enable("gopls")
+        end,
+      })
+
+      -- DartファイルでLSP有効化
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "dart",
+        callback = function()
+          vim.lsp.enable("dartls")
         end,
       })
 
@@ -164,6 +182,7 @@ require("lazy").setup({
         lsp_fallback = false,
       },
       formatters_by_ft = {
+        dart = { "dart_format" },
         lua = { "stylua" },
       },
     },
@@ -172,8 +191,9 @@ require("lazy").setup({
   -- Tree-sitter（シンタックスハイライト強化）
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "master", -- Neovim 0.11対応ブランチ
     build = ":TSUpdate",
-    ft = { "typescript", "typescriptreact", "javascript", "javascriptreact", "lua", "go" },
+    ft = { "typescript", "typescriptreact", "javascript", "javascriptreact", "lua", "go", "dart" },
     -- event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local ok, configs = pcall(require, "nvim-treesitter.configs")
@@ -182,7 +202,7 @@ require("lazy").setup({
       end
 
       configs.setup({
-        ensure_installed = { "typescript", "tsx", "javascript", "lua", "go" },
+        ensure_installed = { "typescript", "tsx", "javascript", "lua", "go", "dart" },
         sync_install = false,
         auto_install = true,
         highlight = {
@@ -417,7 +437,7 @@ vim.cmd([[
 
 -- ハイライト自動実行
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
-  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx" },
+  pattern = { "*.ts", "*.tsx", "*.js", "*.jsx", "*.dart" },
   callback = function()
     -- すでに動いてたら何もしない
     local buf = vim.api.nvim_get_current_buf()
